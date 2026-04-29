@@ -1,98 +1,74 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Image, Pressable, StyleSheet, Text, TextInput, View, } from 'react-native';
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#5d5d5d',
+  },
+  conteinerb :{
+backgroundColor: '#78caf5', // verde Duolingo 🟢
+    paddingVertical: 15,
+    paddingHorizontal: 100,
+    borderRadius: 15,
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+     shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    marginTop: 20,
+  },
+  botaoPressionado: {
+  transform: [{ scale: 0.95 }],
+  opacity: 0.8,
+},
+  input: {
+    height: 40,
+    borderColor: '#ffffff',
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginTop: 20,
+    width: '60%',
+    backgroundColor: '#ffffff',
+  },
+  
+});
 
-export default function HomeScreen() {
+export default function Index() {
+  const router = useRouter();
+  const [usuario, setUsuario] = useState<string>('');
+const [senha, setSenha] = useState<string>('');
+const login = () => {
+  if (usuario === 'L' && senha === '1') {
+    router.push('/menuP');
+  } else {
+    alert('Credenciais inválidas. Tente novamente.');
+  }
+};
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <Image source={require('../../assets/images/Gemini.png')} 
+      style={{ width: 400, height: 200, marginBottom: 20 }} />
+      <TextInput style={styles.input} 
+      placeholder="username" 
+      value={usuario} 
+      onChangeText={setUsuario} 
+      />
+      <TextInput style={styles.input} 
+      placeholder="password" 
+      value={senha} 
+      secureTextEntry
+      onChangeText={setSenha} 
+      />
+      <Pressable style={styles.conteinerb} onPress={login}>
+        <Text style={{ color: '#ffffff', fontSize: 16 }}>acessar</Text>
+      </Pressable>
+      <Pressable style={{height: 30, width: '20%', justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: '#ffffff', alignItems: 'center', borderRadius: 0, marginTop: 10}} onPress={() => alert('Cadastro não implementado')}>
+        <Text style={{ color: '#ffffff', fontSize: 16 }}>cadastro</Text>
+      </Pressable>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
