@@ -1,6 +1,8 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+
+var x = 0;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -9,7 +11,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#5d5d5d',
   },
   conteinerb :{
-backgroundColor: '#78caf5', // verde Duolingo 🟢
+backgroundColor: '#78caf5', 
 
     paddingVertical: 15,
     paddingHorizontal: 100,
@@ -35,26 +37,28 @@ backgroundColor: '#78caf5', // verde Duolingo 🟢
     width: '60%',
     backgroundColor: '#ffffff',
   },
+  barra:{
+  height: 60,
+  width : 350,
+    backgroundColor: '#78caf5',
+    justifyContent: "center",
+    paddingHorizontal: 15,
+    paddingTop: 10, // ajuda no Android]
+    borderRadius: 15,
+   marginBottom: 500
+  },
   
 });
 
 export default function Index() {
   const router = useRouter();
-  const [usuario, setUsuario] = useState<string>('');
-const [senha, setSenha] = useState<string>('');
-const enter = () => {
-  router.push('/menu');
-};
+ 
   return (
-    <View style={styles.container}>
-      <Image source={require('../assets/images/Gemini.png')} 
-      style={{ width: 400, height: 200, marginBottom: 30 }} />
-      <Pressable onPress={enter}>
-       <Image
-        source={require('../assets/images/botaoprojete.png')}
-        style={{ width: 400, height: 200, marginBottom: 30 }}
-       />
-      </Pressable>
-    </View>
+   <View style = {styles.container}>
+    <view style={styles.barra}>
+  <text>barra de cima, onde vai ficar os trem lá</text>
+    </view>
+
+   </View>
   );
 }
