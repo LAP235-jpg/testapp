@@ -48,11 +48,11 @@ const enter = () => {
   return (
     <View style={styles.container}>
       <Image source={require('../assets/images/Gemini.png')} 
-      style={{ width: 400, height: 200, marginBottom: 30 }} />
+      style={{ width: 400, height: 200, marginBottom: 100 }} />
       <Pressable onPress={enter}>
        <Image
         source={require('../assets/images/botaoprojete.png')}
-        style={{ width: 400, height: 200, marginBottom: 30 }}
+        style={{ width: 250, height: 250, marginBottom: 30 }}
        />
       </Pressable>
     </View>

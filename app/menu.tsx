@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 
 var x = 0;
 
@@ -52,12 +52,22 @@ backgroundColor: '#78caf5',
 
 export default function Index() {
   const router = useRouter();
+
+  function nivel1(){
+    router.push('/niveis/nivel1')
+  }
  
   return (
    <View style = {styles.container}>
     <view style={styles.barra}>
-  <text>barra de cima, onde vai ficar os trem lá</text>
+  <text>hello world</text>
     </view>
+    <Pressable onPress={nivel1}>
+      <Image
+             source={require('../assets/images/botaoprojete.png')}
+             style={{ width: 150, height: 150, marginBottom: 0, position: 'absolute', top: -450, left: 10 }}
+            />
+    </Pressable>
 
    </View>
   );
