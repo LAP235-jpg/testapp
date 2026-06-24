@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { ScrollView } from 'react-native-reanimated/lib/typescript/Animated';
 
 var x = 0;
 
@@ -62,6 +63,7 @@ export default function Index() {
     <view style={styles.barra}>
   <text>hello world</text>
     </view>
+
     <Pressable onPress={nivel1}>
       <Image
              source={require('../assets/images/botaoprojete.png')}
