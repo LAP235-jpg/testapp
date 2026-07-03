@@ -43,7 +43,7 @@ export default function Index() {
   const [usuario, setUsuario] = useState<string>('');
 const [senha, setSenha] = useState<string>('');
 const enter = () => {
-  router.push('/menu');
+  router.push('/fases');
 };
   return (
     <View style={styles.container}>
