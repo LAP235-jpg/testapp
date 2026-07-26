@@ -1,6 +1,9 @@
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import React from "react";
-import { View, ScrollView, ImageBackground, Text, } from "react-native";
+import { View, ScrollView, ImageBackground, Text, Pressable, } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+const router = useRouter();
 export default () => {
 	return (
 		<SafeAreaView 
@@ -25,7 +28,13 @@ export default () => {
 						marginHorizontal: 23,
 					}}>
 				</View>
-				<View 
+			<Pressable 
+			onPress={() => { 
+				router.push("/niveis/nivel1");
+			}}
+			>
+				<View
+				
 					style={{
 						alignItems: "center",
 					}}>
@@ -46,7 +55,9 @@ export default () => {
 							{"1"}
 						</Text>
 					</ImageBackground>
+		
 				</View>
+				</Pressable>
 				<ImageBackground 
 					source={{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/w1Bbgc074x/utfvyq0o_expires_30_days.png"}} 
 					resizeMode = {'stretch'}
