@@ -30,7 +30,7 @@ export default () => {
 				</View>
 			<Pressable 
 			onPress={() => { 
-				router.push("/niveis/nivel1");
+				router.push("/fases/fase1");
 			}}
 			>
 				<View

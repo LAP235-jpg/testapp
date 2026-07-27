@@ -1,77 +1,66 @@
 import React, { useMemo, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  SafeAreaView,
   View,
   Text,
   StyleSheet,
   Pressable,
+  Image,
+  TextInput,
 } from "react-native";
 import { useRouter } from "expo-router";
 
-/**
- * Tipo que representa cada alternativa da pergunta.
- */
+type QuizMode = "text" | "image" | "writing";
+
 type Option = {
-  label: string;
+  label?: string;
   value: string;
+  image?: any;
 };
 
-/**
- * Tipagem das props do componente.
- * Assim você consegue reutilizar a tela em outras perguntas.
- */
-type QuizScreenProps = {
-  question?: string;
+type QuizActivityProps = {
+  mode: QuizMode;
+  question: string;
+  questionImage?: any;
   options?: Option[];
   correctAnswer: string;
   nextRoute: string;
   wrongRoute: string;
+  placeholder?: string;
+  progress?: number;
 };
 
-/**
- * Tela de quiz com seleção, validação e navegação.
- */
-export default function QuizScreen({
-  question = "identifique qual é vogal",
-  options = [
-    { label: "A", value: "a" },
-    { label: "B", value: "b" },
-    { label: "L", value: "l" },
-    { label: "k", value: "k" },
-  ],
-  correctAnswer = "a",
+export default function QuizActivity({
+  mode,
+  question,
+  questionImage,
+  options = [],
+  correctAnswer,
   nextRoute,
   wrongRoute,
-}: QuizScreenProps) {
+  placeholder = "digite sua resposta",
+  progress,
+}: QuizActivityProps) {
   const router = useRouter();
-
-  // Guarda qual alternativa o usuário selecionou
   const [selected, setSelected] = useState<string | null>(null);
-
-  // Guarda se a resposta foi correta, errada ou ainda não foi verificada
+  const [typedAnswer, setTypedAnswer] = useState("");
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
 
-  // Controla se o botão "PRÓXIMO" deve aparecer
+  const verifyDisabled = useMemo(() => {
+    if (mode === "writing") return typedAnswer.trim().length === 0;
+    return !selected;
+  }, [mode, selected, typedAnswer]);
+
   const showNextButton = feedback !== null;
 
-  // Bloqueia a verificação se o usuário ainda não escolheu uma opção
-  const verifyDisabled = useMemo(() => !selected, [selected]);
-
-  /**
-   * Função executada quando o usuário toca em "VERIFICAR".
-   * Ela define se a resposta foi correta ou errada.
-   */
   const handleVerify = () => {
-    if (!selected) return;
+    const answer = mode === "writing" ? typedAnswer.trim().toLowerCase() : selected;
+    if (!answer) return;
 
-    const isCorrect = selected === correctAnswer;
+    const isCorrect = answer === correctAnswer.toLowerCase();
     setFeedback(isCorrect ? "correct" : "wrong");
   };
 
-  /**
-   * Função executada quando o usuário toca em "PRÓXIMO".
-   * Ela navega para a rota correta ou errada, conforme o resultado.
-   */
   const handleNext = () => {
     if (feedback === "correct") {
       router.push(nextRoute as never);
@@ -81,64 +70,83 @@ export default function QuizScreen({
     router.push(wrongRoute as never);
   };
 
+  const renderQuestion = () => {
+    if (mode === "image" && questionImage) {
+      return <Image source={questionImage} style={styles.questionImage} />;
+    }
+
+    return <Text style={styles.question}>{question}</Text>;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Barra superior com botão de fechar e barra de progresso */}
       <View style={styles.topBar}>
-        <Pressable onPress={() => router.back()} hitSlop={12}>
+        <Pressable onPress={() => router.push('/fases')} hitSlop={12}>
           <Text style={styles.closeIcon}>×</Text>
         </Pressable>
-
-        <View style={styles.progressBar} />
+        <View style={styles.progressBar}>
+  <View style={[styles.progressFill, { width: `${(progress ?? 0) * 100}%` }]} />
+</View>
       </View>
 
       <View style={styles.content}>
-        {/* Pergunta principal */}
-        <Text style={styles.question}>{question}</Text>
+        {renderQuestion()}
 
-        {/* Área das alternativas em grade */}
-        <View style={styles.grid}>
-          {options.map((item) => {
-            const isSelected = selected === item.value;
-            const isCorrect = feedback !== null && item.value === correctAnswer;
-            const isWrong =
-              feedback !== null &&
-              isSelected &&
-              item.value !== correctAnswer;
+        {mode === "writing" ? (
+          <TextInput
+            value={typedAnswer}
+            onChangeText={setTypedAnswer}
+            placeholder={placeholder}
+            placeholderTextColor="#777"
+            style={styles.input}
+            autoCapitalize="none"
+          />
+        ) : (
+          <View style={styles.grid}>
+            {options.map((item) => {
+              const isSelected = selected === item.value;
+              const isCorrect = feedback !== null && item.value === correctAnswer;
+              const isWrong =
+                feedback !== null &&
+                isSelected &&
+                item.value !== correctAnswer;
 
-            return (
-              <Pressable
-                key={item.value}
-                onPress={() => {
-                  // Só permite trocar a seleção antes de verificar
-                  if (feedback === null) {
-                    setSelected(item.value);
-                  }
-                }}
-                style={({ pressed }) => [
-                  styles.optionButton,
-                  isSelected && styles.optionSelected,
-                  isCorrect && styles.optionCorrect,
-                  isWrong && styles.optionWrong,
-                  pressed && feedback === null && styles.optionPressed,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.optionText,
-                    isSelected && styles.optionTextSelected,
-                    isCorrect && styles.optionTextCorrect,
-                    isWrong && styles.optionTextWrong,
+              return (
+                <Pressable
+                  key={item.value}
+                  onPress={() => {
+                    if (feedback === null) {
+                      setSelected(item.value);
+                    }
+                  }}
+                  style={({ pressed }) => [
+                    styles.optionButton,
+                    isSelected && styles.optionSelected,
+                    isCorrect && styles.optionCorrect,
+                    isWrong && styles.optionWrong,
+                    pressed && feedback === null && styles.optionPressed,
                   ]}
                 >
-                  {item.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+                  {item.image ? (
+                    <Image source={item.image} style={styles.optionImage} />
+                  ) : (
+                    <Text
+                      style={[
+                        styles.optionText,
+                        isSelected && styles.optionTextSelected,
+                        isCorrect && styles.optionTextCorrect,
+                        isWrong && styles.optionTextWrong,
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
 
-        {/* Mensagem de feedback após verificar */}
         {feedback === "correct" && (
           <Text style={styles.correctMessage}>Resposta correta!</Text>
         )}
@@ -147,7 +155,6 @@ export default function QuizScreen({
           <Text style={styles.wrongMessage}>Resposta errada.</Text>
         )}
 
-        {/* Botão de verificar */}
         <Pressable
           onPress={handleVerify}
           disabled={verifyDisabled || feedback !== null}
@@ -160,7 +167,6 @@ export default function QuizScreen({
           <Text style={styles.verifyText}>VERIFICAR</Text>
         </Pressable>
 
-        {/* Botão PRÓXIMO aparece somente depois de verificar */}
         {showNextButton && (
           <Pressable
             onPress={handleNext}
@@ -178,18 +184,13 @@ export default function QuizScreen({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#5B5B5B",
-  },
-
+  container: { flex: 1, backgroundColor: "#5B5B5B" },
   topBar: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 12,
     paddingTop: 8,
   },
-
   closeIcon: {
     color: "#FFFFFF",
     fontSize: 30,
@@ -197,28 +198,36 @@ const styles = StyleSheet.create({
     marginRight: 12,
     marginTop: -2,
   },
-
   progressBar: {
-    flex: 1,
-    height: 8,
-    backgroundColor: "#D9D9D9",
-    borderRadius: 4,
-  },
-
+  flex: 1,
+  height: 8,
+  backgroundColor: "#D9D9D9",
+  borderRadius: 4,
+  overflow: "hidden",
+},
+progressFill: {
+  height: "100%",
+  backgroundColor: "#1CC5D3",
+  borderRadius: 4,
+},
   content: {
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
     paddingTop: 70,
   },
-
   question: {
     color: "#FFFFFF",
     fontSize: 32,
     textAlign: "center",
-    marginBottom: 55,
+    marginBottom: 40,
   },
-
+  questionImage: {
+    width: 240,
+    height: 180,
+    resizeMode: "contain",
+    marginBottom: 30,
+  },
   grid: {
     width: "100%",
     paddingHorizontal: 26,
@@ -227,7 +236,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     rowGap: 26,
   },
-
   optionButton: {
     width: 134,
     height: 57,
@@ -236,60 +244,58 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   optionPressed: {
     opacity: 0.8,
     transform: [{ scale: 0.98 }],
   },
-
   optionSelected: {
     borderWidth: 2,
     borderColor: "#1CC5D3",
   },
-
   optionCorrect: {
     backgroundColor: "#7CDB8A",
     borderWidth: 2,
     borderColor: "#2E9E45",
   },
-
   optionWrong: {
     backgroundColor: "#F28B82",
     borderWidth: 2,
     borderColor: "#D64545",
   },
-
   optionText: {
     color: "#111111",
     fontSize: 28,
   },
-
-  optionTextSelected: {
-    fontWeight: "600",
+  optionTextSelected: { fontWeight: "600" },
+  optionTextCorrect: { color: "#0F3D16" },
+  optionTextWrong: { color: "#5A1414" },
+  optionImage: {
+    width: 50,
+    height: 50,
+    resizeMode: "contain",
   },
-
-  optionTextCorrect: {
-    color: "#0F3D16",
+  input: {
+    width: "82%",
+    height: 54,
+    borderRadius: 12,
+    backgroundColor: "#D9D9D9",
+    paddingHorizontal: 16,
+    color: "#111111",
+    fontSize: 20,
+    marginBottom: 24,
   },
-
-  optionTextWrong: {
-    color: "#5A1414",
-  },
-
   correctMessage: {
     marginTop: 22,
     color: "#7CDB8A",
     fontSize: 18,
     fontWeight: "600",
   },
-
   wrongMessage: {
     marginTop: 22,
     color: "#F28B82",
     fontSize: 18,
     fontWeight: "600",
   },
-
   verifyButton: {
     marginTop: 28,
     width: 241,
@@ -299,22 +305,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   verifyButtonPressed: {
     opacity: 0.85,
     transform: [{ scale: 0.98 }],
   },
-
   verifyButtonDisabled: {
     opacity: 0.45,
   },
-
   verifyText: {
     color: "#111111",
     fontSize: 22,
     fontWeight: "500",
   },
-
   nextButton: {
     marginTop: 14,
     width: 241,
@@ -324,12 +326,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   nextButtonPressed: {
     opacity: 0.85,
     transform: [{ scale: 0.98 }],
   },
-
   nextText: {
     color: "#111111",
     fontSize: 22,
