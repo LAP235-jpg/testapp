@@ -8,7 +8,7 @@ import {
   Image,
   TextInput,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, Href } from "expo-router";
 
 type QuizMode = "text" | "image" | "writing";
 
@@ -24,8 +24,8 @@ type QuizActivityProps = {
   questionImage?: any;
   options?: Option[];
   correctAnswer: string;
-  nextRoute: string;
-  wrongRoute: string;
+  nextRoute: Href;
+  wrongRoute: Href;
   placeholder?: string;
   progress?: number;
 };
@@ -39,12 +39,14 @@ export default function QuizActivity({
   nextRoute,
   wrongRoute,
   placeholder = "digite sua resposta",
-  progress,
+  progress = 0,
 }: QuizActivityProps) {
   const router = useRouter();
+  const [startTime] = useState(Date.now());
   const [selected, setSelected] = useState<string | null>(null);
   const [typedAnswer, setTypedAnswer] = useState("");
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
+  const [isCorrect, setIsCorrect] = useState(false);
 
   const verifyDisabled = useMemo(() => {
     if (mode === "writing") return typedAnswer.trim().length === 0;
@@ -54,22 +56,28 @@ export default function QuizActivity({
   const showNextButton = feedback !== null;
 
   const handleVerify = () => {
-    const answer = mode === "writing" ? typedAnswer.trim().toLowerCase() : selected;
+    const answer =
+      mode === "writing" ? typedAnswer.trim().toLowerCase() : selected;
+
     if (!answer) return;
 
-    const isCorrect = answer === correctAnswer.toLowerCase();
-    setFeedback(isCorrect ? "correct" : "wrong");
+    const correct = answer === correctAnswer.toLowerCase();
+    setIsCorrect(correct);
+    setFeedback(correct ? "correct" : "wrong");
   };
 
-  const handleNext = () => {
-    if (feedback === "correct") {
-      router.push(nextRoute as never);
-      return;
-    }
+//parte do xp, tempo gasto e também da acurácia, que será enviado para a próxima tela
+const handleNext = () => {
+  const endTime = Date.now();
+  const timeSpent = endTime - startTime;
+  const xp = isCorrect ? 4 : 0;
+  const accuracy = isCorrect ? 100 : 0;
 
-    router.push(wrongRoute as never);
-  };
+  const route = isCorrect ? nextRoute : wrongRoute;
+  const href = `${route}?xp=${xp}&accuracy=${accuracy}&timeSpent=${timeSpent}` as Href;
 
+  router.push(href);
+};
   const renderQuestion = () => {
     if (mode === "image" && questionImage) {
       return <Image source={questionImage} style={styles.questionImage} />;
@@ -81,12 +89,13 @@ export default function QuizActivity({
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
-        <Pressable onPress={() => router.push('/fases')} hitSlop={12}>
+        <Pressable onPress={() => router.back()} hitSlop={12}>
           <Text style={styles.closeIcon}>×</Text>
         </Pressable>
+
         <View style={styles.progressBar}>
-  <View style={[styles.progressFill, { width: `${(progress ?? 0) * 100}%` }]} />
-</View>
+          <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+        </View>
       </View>
 
       <View style={styles.content}>
@@ -105,25 +114,21 @@ export default function QuizActivity({
           <View style={styles.grid}>
             {options.map((item) => {
               const isSelected = selected === item.value;
-              const isCorrect = feedback !== null && item.value === correctAnswer;
-              const isWrong =
-                feedback !== null &&
-                isSelected &&
-                item.value !== correctAnswer;
+              const isCorrectOption = feedback !== null && item.value === correctAnswer;
+              const isWrongOption =
+                feedback !== null && isSelected && item.value !== correctAnswer;
 
               return (
                 <Pressable
                   key={item.value}
                   onPress={() => {
-                    if (feedback === null) {
-                      setSelected(item.value);
-                    }
+                    if (feedback === null) setSelected(item.value);
                   }}
                   style={({ pressed }) => [
                     styles.optionButton,
                     isSelected && styles.optionSelected,
-                    isCorrect && styles.optionCorrect,
-                    isWrong && styles.optionWrong,
+                    isCorrectOption && styles.optionCorrect,
+                    isWrongOption && styles.optionWrong,
                     pressed && feedback === null && styles.optionPressed,
                   ]}
                 >
@@ -134,8 +139,8 @@ export default function QuizActivity({
                       style={[
                         styles.optionText,
                         isSelected && styles.optionTextSelected,
-                        isCorrect && styles.optionTextCorrect,
-                        isWrong && styles.optionTextWrong,
+                        isCorrectOption && styles.optionTextCorrect,
+                        isWrongOption && styles.optionTextWrong,
                       ]}
                     >
                       {item.label}
@@ -182,7 +187,7 @@ export default function QuizActivity({
     </SafeAreaView>
   );
 }
-
+//end of component
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#5B5B5B" },
   topBar: {
@@ -199,17 +204,16 @@ const styles = StyleSheet.create({
     marginTop: -2,
   },
   progressBar: {
-  flex: 1,
-  height: 8,
-  backgroundColor: "#D9D9D9",
-  borderRadius: 4,
-  overflow: "hidden",
-},
-progressFill: {
-  height: "100%",
-  backgroundColor: "#1CC5D3",
-  borderRadius: 4,
-},
+    flex: 1,
+    height: 8,
+    backgroundColor: "#D9D9D9",
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    backgroundColor: "#1CC5D3",
+  },
   content: {
     flex: 1,
     alignItems: "center",
@@ -220,7 +224,7 @@ progressFill: {
     color: "#FFFFFF",
     fontSize: 32,
     textAlign: "center",
-    marginBottom: 40,
+    marginBottom: 55,
   },
   questionImage: {
     width: 240,

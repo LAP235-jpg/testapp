@@ -1,7 +1,12 @@
 import React, { useMemo, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import { useRouter } from "expo-router";
+import {
+  SafeAreaView,
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+} from "react-native";
+import { useRouter, type Href } from "expo-router";
 
 type Option = {
   label: string;
@@ -26,11 +31,12 @@ export default function MarkActivity({
   progress = 0,
 }: MarkActivityProps) {
   const router = useRouter();
+  const [startTime] = useState(Date.now());
   const [selected, setSelected] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
+  const [isCorrect, setIsCorrect] = useState(false);
 
   const verifyDisabled = useMemo(() => selected.length === 0, [selected]);
-  const showNextButton = feedback !== null;
 
   const toggleOption = (value: string) => {
     if (feedback !== null) return;
@@ -46,19 +52,27 @@ export default function MarkActivity({
     const normalizedSelected = [...selected].sort().join(",");
     const normalizedCorrect = [...correctAnswers].sort().join(",");
 
-    setFeedback(
-      normalizedSelected === normalizedCorrect ? "correct" : "wrong"
-    );
+    const correct = normalizedSelected === normalizedCorrect;
+    setIsCorrect(correct);
+    setFeedback(correct ? "correct" : "wrong");
   };
 
   const handleNext = () => {
-    router.push((feedback === "correct" ? nextRoute : wrongRoute) as never);
+    const endTime = Date.now();
+    const timeSpent = endTime - startTime;
+    const xp = isCorrect ? 4 : 0;
+    const accuracy = isCorrect ? 100 : 0;
+
+    const route = isCorrect ? nextRoute : wrongRoute;
+    const href = `${route}?xp=${xp}&accuracy=${accuracy}&timeSpent=${timeSpent}` as Href;
+
+    router.push(href);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
-        <Pressable onPress={() => router.push('/fases')} hitSlop={12}>
+        <Pressable onPress={() => router.back()} hitSlop={12}>
           <Text style={styles.closeIcon}>×</Text>
         </Pressable>
 
@@ -110,7 +124,7 @@ export default function MarkActivity({
           <Text style={styles.verifyText}>VERIFICAR</Text>
         </Pressable>
 
-        {showNextButton && (
+        {feedback !== null && (
           <Pressable
             onPress={handleNext}
             style={({ pressed }) => [
