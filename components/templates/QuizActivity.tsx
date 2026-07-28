@@ -1,14 +1,15 @@
+import { useRouter, type Href } from "expo-router";
 import React, { useMemo, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
   Image,
+  Pressable,
+  StyleSheet,
+  Text,
   TextInput,
+  View,
 } from "react-native";
-import { useRouter, Href } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useWorld } from "../../context/WorldContext";
 
 type QuizMode = "text" | "image" | "writing";
 
@@ -24,8 +25,8 @@ type QuizActivityProps = {
   questionImage?: any;
   options?: Option[];
   correctAnswer: string;
-  nextRoute: Href;
-  wrongRoute: Href;
+  nextRoute: string;
+  wrongRoute: string;
   placeholder?: string;
   progress?: number;
 };
@@ -42,6 +43,7 @@ export default function QuizActivity({
   progress = 0,
 }: QuizActivityProps) {
   const router = useRouter();
+  const { addActivityResult } = useWorld();
   const [startTime] = useState(Date.now());
   const [selected, setSelected] = useState<string | null>(null);
   const [typedAnswer, setTypedAnswer] = useState("");
@@ -53,12 +55,11 @@ export default function QuizActivity({
     return !selected;
   }, [mode, selected, typedAnswer]);
 
-  const showNextButton = feedback !== null;
-
   const handleVerify = () => {
     const answer =
-      mode === "writing" ? typedAnswer.trim().toLowerCase() : selected;
-
+      mode === "writing"
+        ? typedAnswer.trim().toLowerCase()
+        : selected;
     if (!answer) return;
 
     const correct = answer === correctAnswer.toLowerCase();
@@ -66,18 +67,31 @@ export default function QuizActivity({
     setFeedback(correct ? "correct" : "wrong");
   };
 
-//parte do xp, tempo gasto e também da acurácia, que será enviado para a próxima tela
-const handleNext = () => {
-  const endTime = Date.now();
-  const timeSpent = endTime - startTime;
-  const xp = isCorrect ? 4 : 0;
-  const accuracy = isCorrect ? 100 : 0;
+  const handleNext = () => {
+    const endTime = Date.now();
+    const timeSpentMs = endTime - startTime;
+    const timeSeconds = Math.floor(timeSpentMs / 1000);
 
-  const route = isCorrect ? nextRoute : wrongRoute;
-  const href = `${route}?xp=${xp}&accuracy=${accuracy}&timeSpent=${timeSpent}` as Href;
+    const xp = isCorrect ? 4 : 0;
+    const accuracy = isCorrect ? 100 : 0;
 
-  router.push(href);
-};
+    if (xp > 0) {
+      addActivityResult({
+        id: Date.now().toString(),
+        xp,
+        timeSeconds,
+        correct: isCorrect ? 1 : 0,
+        total: 1,
+      });
+    }
+
+    const route = isCorrect ? nextRoute : wrongRoute;
+    const href = `${route}?xp=${xp}&accuracy=${accuracy}&timeSpent=${timeSpentMs}` as Href;
+
+    router.push(href);
+  };
+
+
   const renderQuestion = () => {
     if (mode === "image" && questionImage) {
       return <Image source={questionImage} style={styles.questionImage} />;
@@ -171,23 +185,23 @@ const handleNext = () => {
         >
           <Text style={styles.verifyText}>VERIFICAR</Text>
         </Pressable>
-
-        {showNextButton && (
-          <Pressable
-            onPress={handleNext}
-            style={({ pressed }) => [
-              styles.nextButton,
-              pressed && styles.nextButtonPressed,
-            ]}
-          >
-            <Text style={styles.nextText}>PRÓXIMO</Text>
-          </Pressable>
-        )}
       </View>
+
+      {feedback !== null && (
+        <Pressable
+          onPress={handleNext}
+          style={({ pressed }) => [
+            styles.nextButton,
+            pressed && styles.nextButtonPressed,
+          ]}
+        >
+          <Text style={styles.nextText}>PRÓXIMO</Text>
+        </Pressable>
+      )}
     </SafeAreaView>
   );
 }
-//end of component
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#5B5B5B" },
   topBar: {

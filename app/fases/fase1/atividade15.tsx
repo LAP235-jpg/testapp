@@ -14,8 +14,8 @@ export default function Atividade2Screen() {
     { label: "K", value: "k" },
   ]}
   correctAnswers={["u", "e", "a"]}
-  nextRoute="/fases/fase1/final1"
-  wrongRoute="/fases/fase1/final1"
+  nextRoute="/fases/teste-resultado"
+  wrongRoute="/fases/teste-resultado"
   progress={0.8}
 />
   );

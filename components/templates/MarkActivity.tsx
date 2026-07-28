@@ -1,12 +1,13 @@
 import React, { useMemo, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  SafeAreaView,
   View,
   Text,
   StyleSheet,
   Pressable,
 } from "react-native";
 import { useRouter, type Href } from "expo-router";
+import { useWorld } from "../../context/WorldContext";
 
 type Option = {
   label: string;
@@ -31,6 +32,7 @@ export default function MarkActivity({
   progress = 0,
 }: MarkActivityProps) {
   const router = useRouter();
+  const { addActivityResult } = useWorld();
   const [startTime] = useState(Date.now());
   const [selected, setSelected] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
@@ -59,12 +61,24 @@ export default function MarkActivity({
 
   const handleNext = () => {
     const endTime = Date.now();
-    const timeSpent = endTime - startTime;
+    const timeSpentMs = endTime - startTime;
+    const timeSeconds = Math.floor(timeSpentMs / 1000);
+
     const xp = isCorrect ? 4 : 0;
     const accuracy = isCorrect ? 100 : 0;
 
+    if (xp > 0) {
+      addActivityResult({
+        id: Date.now().toString(),
+        xp,
+        timeSeconds,
+        correct: isCorrect ? 1 : 0,
+        total: 1,
+      });
+    }
+
     const route = isCorrect ? nextRoute : wrongRoute;
-    const href = `${route}?xp=${xp}&accuracy=${accuracy}&timeSpent=${timeSpent}` as Href;
+    const href = `${route}?xp=${xp}&accuracy=${accuracy}&timeSpent=${timeSpentMs}` as Href;
 
     router.push(href);
   };

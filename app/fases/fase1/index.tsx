@@ -1,9 +1,18 @@
 import React from "react";
 import { ScrollView, View, Text, StyleSheet,Image, Pressable } from "react-native";
 import { useRouter } from "expo-router";
+import { useWorld } from "../../../context/WorldContext";
 
 export default function IndexScreen() {
   const router = useRouter();
+  const { setCurrentWorld, resetWorld, setWorldStartTime } = useWorld();
+
+  const handleStart = () => {
+  setCurrentWorld(1);
+  resetWorld();
+  setWorldStartTime(Date.now());
+  router.push("/fases/fase1/atividade11");
+};
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -34,7 +43,7 @@ Aprender a identificar vogais e consoantes é um passo importante para começar 
       </Text>
 
       <Pressable
-        onPress={() => router.push("/fases/fase1/atividade11")}
+        onPress={handleStart}
         style={styles.button}
       >
         <Text style={styles.buttonText}>COMEÇAR</Text>
@@ -42,6 +51,7 @@ Aprender a identificar vogais e consoantes é um passo importante para começar 
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
