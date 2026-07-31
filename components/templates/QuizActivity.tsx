@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   nextText: {
-    color: "#111111",
+    color: "#000000",
     fontSize: 22,
     fontWeight: "500",
   },

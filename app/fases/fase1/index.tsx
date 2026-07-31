@@ -17,6 +17,13 @@ export default function IndexScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View>
+        <Pressable onPress={() => router.back()} style={{ position: "absolute", top: 10, left: -170 }}>
+          <Text style={{ color: "#FFFFFF", fontSize: 20, marginBottom: 10 }}>
+            x
+          </Text>
+        </Pressable>
+      </View>
+      <View>
       <Image source={require("../../../assets/images/TALKPUP.png")} 
      style={{ width: 400, height: 200, marginBottom: 0 }}>
       </Image>
