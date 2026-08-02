@@ -6,12 +6,13 @@ import { useWorld } from "../../../context/WorldContext";
 export default function IndexScreen() {
   const router = useRouter();
   const { setCurrentWorld, resetWorld, setWorldStartTime } = useWorld();
+  // const { setCurrentWorld, resetWorld, setWorldStartTime } = useWorld();
 
   const handleStart = () => {
   setCurrentWorld(1);
   resetWorld();
   setWorldStartTime(Date.now());
-  router.push("/fases/fase1/atividade11");
+  router.push("/fases/fase1/atividade1");
 };
 
   return (

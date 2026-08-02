@@ -13,8 +13,8 @@ export default function Atividade1Screen() {
     { label: "D", value: "d" },
   ]}
   correctAnswer="a"
-  nextRoute="/fases/fase1/atividade12"
-  wrongRoute="/fases/fase1/atividade12"
+  nextRoute="/fases/fase1/atividade2"
+  wrongRoute="/fases/fase1/atividade2"
 />
   );
 }

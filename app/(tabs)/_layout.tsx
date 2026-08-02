@@ -37,7 +37,7 @@ export default function Layout() {
       }}
     >
       <Tabs.Screen
-        name="fases"
+        name="trilha"
         options={{
           title: "fases",
           tabBarIcon: () => (

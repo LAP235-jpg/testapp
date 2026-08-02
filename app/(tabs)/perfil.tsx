@@ -1,30 +1,108 @@
-import { View, Text, StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 
-export default function Perfil() {
+import { Profile } from "../../models/Profile";
+import { loadProfile } from "../../services/ProfileService";
+
+export default function ProfileScreen() {
+  const [profile, setProfile] = useState<Profile | null>(null);
+
+  useEffect(() => {
+    async function carregarPerfil() {
+      const data = await loadProfile();
+      setProfile(data);
+    }
+
+    carregarPerfil();
+  }, []);
+
+  if (!profile) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#78caf5" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        Meu Perfil
-      </Text>
 
-      <Text>
-        Tela de perfil funcionando 🚀
-      </Text>
+      <Image
+        source={require("../../assets/icons/user.png")}
+        style={styles.avatar}
+      />
+
+      <Text style={styles.name}>{profile.name}</Text>
+
+      <View style={styles.card}>
+        <Text style={styles.info}>⭐ XP: {profile.xp}</Text>
+
+        <Text style={styles.info}>
+          🏆 Nível: {profile.level}
+        </Text>
+
+        <Text style={styles.info}>
+          🌎 Mundo Atual: {profile.currentWorld}
+        </Text>
+
+        <Text style={styles.info}>
+          🎯 Precisão: {profile.accuracy}%
+        </Text>
+
+        <Text style={styles.info}>
+          ⏱ Tempo estudado: {profile.studyTime}s
+        </Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+
+  loading: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#5d5d5d",
   },
 
-  title: {
-    fontSize: 30,
+  container: {
+    flex: 1,
+    backgroundColor: "#5d5d5d",
+    alignItems: "center",
+    paddingTop: 70,
+  },
+
+  avatar: {
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    marginBottom: 20,
+  },
+
+  name: {
+    fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 10,
+    color: "white",
+    marginBottom: 25,
+  },
+
+  card: {
+    width: "90%",
+    backgroundColor: "#737373",
+    borderRadius: 15,
+    padding: 20,
+  },
+
+  info: {
+    color: "white",
+    fontSize: 18,
+    marginBottom: 15,
   },
 });

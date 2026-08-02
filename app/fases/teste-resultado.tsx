@@ -47,7 +47,7 @@ export default function TesteResultadoScreen() {
       <Pressable
         onPress={() => {
           resetWorld();
-          router.push("/fases");
+          router.push("/trilha");
         }}
         style={{
           marginTop: 20,

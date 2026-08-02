@@ -13,8 +13,8 @@ export default function Atividade2Screen() {
     { label: "E", value: "e" }
   ]}
   correctAnswer="e"
-  nextRoute="/fases/fase1/atividade15"
-  wrongRoute="/fases/fase1/atividade15"
+  nextRoute="/fases/fase1/atividade5"
+  wrongRoute="/fases/fase1/atividade5"
   progress={0.6}
 />
   );
