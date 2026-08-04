@@ -61,3 +61,46 @@ export async function deleteProfile() {
     console.log("Erro ao deletar perfil:", error);
   }
 }//tenta deletar apenas o perfil do AsyncStorage. Em caso de erro, loga o erro.
+export async function updatePhaseProgress(
+  phase: keyof Profile["phases"],
+  progress: Profile["phases"][keyof Profile["phases"]]
+) {
+  try {
+    console.log("========== UPDATE PHASE ==========");
+    console.log("Fase:", phase);
+    console.log("Novo progresso:", progress);
+
+    const profile = await loadProfile();
+
+    console.log("Perfil carregado:", profile);
+
+    if (!profile) {
+      console.log("ERRO: perfil não encontrado.");
+      return;
+    }
+
+    const previousProgress = profile.phases[phase];
+
+    console.log("Progresso anterior:", previousProgress);
+
+    if (progress.xp > previousProgress.xp) {
+      console.log("Novo resultado é melhor. Atualizando...");
+
+      profile.xp += progress.xp - previousProgress.xp;
+      profile.phases[phase] = progress;
+
+      console.log("Perfil antes de salvar:", profile);
+
+      await saveProfile(profile);
+
+      const saved = await loadProfile();
+      console.log("Perfil após salvar:", saved);
+    } else {
+      console.log("Resultado pior ou igual. Nada foi salvo.");
+    }
+
+    console.log("==================================");
+  } catch (error) {
+    console.log("Erro ao atualizar progresso da fase:", error);
+  }
+}//essa função atualiza o progresso de uma fase específica. Ela recebe o nome da fase, xp, acurácia e tempo. Atualiza o perfil com esses dados e marca a fase como concluída. Em caso de erro, loga o erro.

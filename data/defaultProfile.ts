@@ -11,6 +11,46 @@ export const defaultProfile: Profile = {
   accuracy: 0,
   studyTime: 0,
   createdAt: new Date().toISOString(),
-}
-// esse código define um objeto defaultProfile que
-//  representa um perfil padrão com valores iniciais para cada propriedade do tipo Profile.
+
+  phases: {
+    fase1: {
+      xp: 0,
+      accuracy: 0,
+      time: 0,
+      completed: false,
+    },
+    fase2: {
+      xp: 0,
+      accuracy: 0,
+      time: 0,
+      completed: false,
+    },
+    fase3: {
+      xp: 0,
+      accuracy: 0,
+      time: 0,
+      completed: false,
+    },
+    fase4: {
+      xp: 0,
+      accuracy: 0,
+      time: 0,
+      completed: false,
+    },
+    fase5: {
+      xp: 0,
+      accuracy: 0,
+      time: 0,
+      completed: false,
+    },
+  },
+};
+/*quando as fases cresserem, basta adicionar mais fases no objeto phases, 
+seguindo o mesmo padrão das fases existentes.
+  faseX: {
+    xp: 0,
+    accuracy: 0,
+    time: 0,
+    completed: false,
+  },
+*/

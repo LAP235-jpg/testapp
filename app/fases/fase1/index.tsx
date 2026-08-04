@@ -9,8 +9,8 @@ export default function IndexScreen() {
   // const { setCurrentWorld, resetWorld, setWorldStartTime } = useWorld();
 
   const handleStart = () => {
-  setCurrentWorld(1);
   resetWorld();
+  setCurrentWorld(1);
   setWorldStartTime(Date.now());
   router.push("/fases/fase1/atividade1");
 };

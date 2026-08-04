@@ -43,10 +43,9 @@ export function WorldProvider({ children }: { children: ReactNode }) {
   }
 
   function resetWorld() {
-    setResults([]);
-    setCurrentWorld(null);
-    setWorldStartTime(null);
-  }
+  setResults([]);
+  setWorldStartTime(null);
+}
 
   const value: WorldContextType = {
     totalXp,

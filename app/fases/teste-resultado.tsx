@@ -1,11 +1,30 @@
 import React from "react";
-import { View, Text, Pressable, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  Pressable,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+
 import { useWorld } from "../../context/WorldContext";
+import { updatePhaseProgress } from "../../services/ProfileService";
+import { Profile } from "@/models/Profile";
+import ResultCard from "../../components/ResultCard";
 
 export default function TesteResultadoScreen() {
   const router = useRouter();
-  const { totalXp, totalTimeSeconds, accuracy, resetWorld } = useWorld();
+
+  const {
+    currentWorld,
+    totalXp,
+    totalTimeSeconds,
+    accuracy,
+    resetWorld,
+  } = useWorld();
 
   const accuracyPercent = Math.round(accuracy * 100);
 
@@ -14,50 +33,135 @@ export default function TesteResultadoScreen() {
     const m = Math.floor((totalSeconds % 3600) / 60);
     const s = totalSeconds % 60;
 
-    if (h > 0) {
-      return `${h}h ${m}m ${s}s`;
-    }
-    if (m > 0) {
-      return `${m}m ${s}s`;
-    }
+    if (h > 0) return `${h}h ${m}m ${s}s`;
+    if (m > 0) return `${m}m ${s}s`;
+
     return `${s}s`;
+  }
+
+  async function handleContinue() {
+    if (currentWorld !== null) {
+      await updatePhaseProgress(
+        `fase${currentWorld}` as keyof Profile["phases"],
+        {
+          xp: totalXp,
+          accuracy: accuracyPercent,
+          time: totalTimeSeconds,
+          completed: true,
+        }
+      );
+    }
+
+    resetWorld();
+    router.push("/trilha");
   }
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: "#222" }}
-      contentContainerStyle={{ padding: 20 }}
+      style={styles.container}
+      contentContainerStyle={styles.content}
     >
-      <Text style={{ color: "#fff", fontSize: 22, marginBottom: 20 }}>
-        TELA DE TESTE - RESULTADOS
+
+      {/* Logo */}
+
+      <Image
+        source={require("../../assets/images/TALKPUP.png")}
+        style={styles.logo}
+      />
+
+      {/* Título */}
+
+      <Text style={styles.title}>
+        Prática Completa!
       </Text>
 
-      <Text style={{ color: "#fff", fontSize: 16 }}>
-        XP total: {totalXp}
-      </Text>
+      {/* Linha Superior */}
 
-      <Text style={{ color: "#fff", fontSize: 16 }}>
-        Tempo total: {formatTime(totalTimeSeconds)}
-      </Text>
+      <View style={styles.row}>
 
-      <Text style={{ color: "#fff", fontSize: 16 }}>
-        Acurácia: {accuracyPercent}%
-      </Text>
+        <ResultCard
+          title="XP TOTAL"
+          value={totalXp}
+          icon="flash"
+          color="#1B8FFF"
+        />
+
+        <ResultCard
+          title="INCRÍVEL"
+          value={`${accuracyPercent}%`}
+          icon="target"
+          color="#16D6C5"
+        />
+
+      </View>
+
+      {/* Tempo */}
+
+      <ResultCard
+        title="TEMPO"
+        value={formatTime(totalTimeSeconds)}
+        icon="time"
+        color="#22C7F2"
+      />
+
+      {/* Botão */}
 
       <Pressable
-        onPress={() => {
-          resetWorld();
-          router.push("/trilha");
-        }}
-        style={{
-          marginTop: 20,
-          backgroundColor: "#444",
-          padding: 12,
-          borderRadius: 6,
-        }}
+        style={styles.button}
+        onPress={handleContinue}
       >
-        <Text style={{ color: "#fff" }}>Resetar e voltar para fases</Text>
+        <Ionicons
+          name="play"
+          size={42}
+          color="#fff"
+        />
       </Pressable>
+
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+
+  container: {
+    flex: 1,
+    backgroundColor: "#5B5B5B",
+  },
+
+  content: {
+    flexGrow: 1,
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingVertical: 40,
+  },
+
+  logo: {
+    width: 140,
+    height: 140,
+    resizeMode: "contain",
+  },
+
+  title: {
+    fontSize: 34,
+    fontWeight: "bold",
+    color: "#18C5F2",
+  },
+
+  row: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  button: {
+    width: "92%",
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: "#18C8D8",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+
+});

@@ -1,23 +1,27 @@
-export interface Profile {
-// Identificador único do perfil
-  id: string;
+export interface PhaseProgress {
+  xp: number;
+  accuracy: number;
+  time: number;
+  completed: boolean;
+}
 
-  // Dados pessoais
+export interface Profile {
+  id: string;
   name: string;
   photo: string | null;
-
-  // Progressão
   xp: number;
   level: number;
-
-  // Progresso do jogo
   currentWorld: number;
   completedLessons: number;
-
-  // Estatísticas
   accuracy: number;
   studyTime: number;
-
-  // Data de criação do perfil
   createdAt: string;
+
+  phases: {
+    fase1: PhaseProgress;
+    fase2: PhaseProgress;
+    fase3: PhaseProgress;
+    fase4: PhaseProgress;
+    fase5: PhaseProgress;
+  };
 }

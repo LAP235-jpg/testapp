@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Image,
   ActivityIndicator,
+  Pressable
 } from "react-native";
 
 import { Profile } from "../../models/Profile";
-import { loadProfile } from "../../services/ProfileService";
+import { loadProfile, deleteProfile } from "../../services/ProfileService";
 
 export default function ProfileScreen() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -58,6 +59,19 @@ export default function ProfileScreen() {
         <Text style={styles.info}>
           ⏱ Tempo estudado: {profile.studyTime}s
         </Text>
+        <View>
+        <Pressable
+          onPress={() => {
+           deleteProfile();
+          console.log("profile deletado");
+          }}
+        >
+          <Text style={{ color: "#f60000f0", fontSize: 16, marginTop: 20 }}>
+           teste de botão
+          </Text>
+        </Pressable>
+         
+        </View>
       </View>
     </View>
   );
