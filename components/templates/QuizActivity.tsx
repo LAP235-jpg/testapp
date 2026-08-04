@@ -173,31 +173,30 @@ export default function QuizActivity({
         {feedback === "wrong" && (
           <Text style={styles.wrongMessage}>Resposta errada.</Text>
         )}
+<Pressable
+    onPress={handleVerify}
+    disabled={verifyDisabled || feedback !== null}
+    style={({ pressed }) => [
+      styles.verifyButton,
+      verifyDisabled && styles.verifyButtonDisabled,
+      pressed && !verifyDisabled && feedback === null && styles.verifyButtonPressed,
+    ]}
+  >
+    <Text style={styles.verifyText}>VERIFICAR</Text>
+  </Pressable>
 
-        <Pressable
-          onPress={handleVerify}
-          disabled={verifyDisabled || feedback !== null}
-          style={({ pressed }) => [
-            styles.verifyButton,
-            verifyDisabled && styles.verifyButtonDisabled,
-            pressed && !verifyDisabled && feedback === null && styles.verifyButtonPressed,
-          ]}
-        >
-          <Text style={styles.verifyText}>VERIFICAR</Text>
-        </Pressable>
-      </View>
-
-      {feedback !== null && (
-        <Pressable
-          onPress={handleNext}
-          style={({ pressed }) => [
-            styles.nextButton,
-            pressed && styles.nextButtonPressed,
-          ]}
-        >
-          <Text style={styles.nextText}>PRÓXIMO</Text>
-        </Pressable>
-      )}
+  {feedback !== null && (
+    <Pressable
+      onPress={handleNext}
+      style={({ pressed }) => [
+        styles.nextButton,
+        pressed && styles.nextButtonPressed,
+      ]}
+    >
+      <Text style={styles.nextText}>PRÓXIMO</Text>
+    </Pressable>
+  )}
+</View>
     </SafeAreaView>
   );
 }
@@ -349,8 +348,8 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   nextText: {
-    color: "#000000",
+    color: "#111111",
     fontSize: 22,
     fontWeight: "500",
-  },
+  }
 });

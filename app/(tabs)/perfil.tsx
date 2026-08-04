@@ -66,8 +66,8 @@ export default function ProfileScreen() {
           console.log("profile deletado");
           }}
         >
-          <Text style={{ color: "#f60000f0", fontSize: 16, marginTop: 20 }}>
-           teste de botão
+          <Text style={styles.delete}>
+           deletar perfil
           </Text>
         </Pressable>
          
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
 
-  card: {
+  card: { 
     width: "90%",
     backgroundColor: "#737373",
     borderRadius: 15,
@@ -118,5 +118,15 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     marginBottom: 15,
+  },
+   delete: {
+    color: "#111111",
+    fontSize: 22,
+    fontWeight: "500",
+    backgroundColor: "#c55e5e",
+    padding: 10,
+    borderRadius: 8,
+    textAlign: "center",
+    marginTop: 20,
   },
 });
